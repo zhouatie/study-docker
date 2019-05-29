@@ -1,5 +1,9 @@
 https://juejin.im/post/5a498ad9f265da43052ef8d6
 https://juejin.im/post/5c2c69cee51d450d9707236e
+https://juejin.im/entry/577a70eac4c97100557b9c5e
+node: 
+https://nodejs.org/zh-cn/docs/guides/nodejs-docker-webapp/
+
 
 docker container ls
 终止状态的容器可以用 docker container ls -a 命令看到
@@ -66,6 +70,7 @@ docker build -t nginx:v3 .
 
 
 新建并启动 docker run
+
 例如，下面的命令输出一个 “Hello World”，之后终止容器。
 $ docker run ubuntu:18.04 /bin/echo 'Hello world'
 
@@ -93,9 +98,147 @@ root@af8bae53bdd3:/#
 
 
 
+可以利用 docker container start 命令，直接将一个已经终止的容器启动运行。
+
+使用 docker run -d 运行容器，让 Docker 在后台运行
+
+
+
+docker container ls 查看容器信息
+
+
+
+docker container stop 来终止一个运行中的容器
+
+
+
+用户通过 exit 命令或 Ctrl+d 来退出终端时，所创建的容器立刻终止。
+
+
+
+docker stop amazing_cori
+
+
+
+处于终止状态的容器，可以通过 docker container start 命令来重新启动。
+
+
+
+docker container restart 命令会将一个运行态的容器终止，然后再重新启动它。
+
+
+
+docker exec在运行的容器中执行命令
+
+docker exec -i -t mynginx /bin/bash
+
+
+
+docker ps -a 命令查看已经在运行的容器，然后使用容器 ID 进入容器
+
+docker exec -it 9df70f9a0714 /bin/bash
 
 
 
 
 
+如果要导出本地某个容器，可以使用 docker export 命令。
 
+$ docker container ls -a
+CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES
+7691a814370e ubuntu:18.04 "/bin/bash" 36 hours ago Exited (0) 21 hours ago test
+$ docker export 7691a814370e > ubuntu.tar
+
+
+
+可以使用 docker import 从容器快照文件中再导入为镜像，例如
+$ cat ubuntu.tar | docker import - test/ubuntu:v1.0
+$ docker image ls
+REPOSITORY TAG IMAGE ID CREATED VIRTUAL SIZE
+test/ubuntu v1.0 9d37a6082e97 About a minute ago 171.3 MB
+
+
+
+可以使用 docker container rm 来删除一个处于终止状态的容器。例如
+$ docker container rm trusting_newton
+trusting_newton
+
+
+
+用 docker container ls -a 命令可以查看所有已经创建的包括终止状态的容器，如果数量太多要一个个删除可能会很麻烦，用下面的命令可以清理掉所有处于终止状态的容器。
+$ docker container prune
+
+
+
+docker logs <contain name | contain id>
+
+docker logs 2b1b7a428627 查看docker容器的输出日志
+
+
+
+
+
+Docker是基于Linux 64bit的，无法在32bit的linux/Windows/unix环境下使用
+
+
+
+
+
+Dockerfile
+
+WORKDIR <工作目录路径>
+
+之前提到一些初学者常犯的错误是把 Dockerfile 等同于 Shell 脚本来书写，这种错误的理解还可能会导致出现下面这样的错误：
+RUN cd /app
+RUN echo "hello" > world.txt
+如果将这个 Dockerfile 进行构建镜像运行后，会发现找不到 /app/world.txt 文件，或者其内容不是 hello。原因其实很简单，在 Shell 中，连续两行是同一个进程执行环境，因此前一个命令修改的内存状态，会直接影响后一个命令；而在 Dockerfile 中，这两行 RUN 命令的执行环境根本不同，是两个完全不同的容器。这就是对 Dockerfile 构建分层存储的概念不了解所导致的错误。
+
+
+
+
+
+Dockerfile
+
+FROM ....
+
+...
+
+创建镜像
+
+docker build -t my-nodejs-app
+
+启动node容器的服务
+
+
+
+docker run -p 49160:8080 -d zhouatie/node-web-app （docker run -p 本地端口:容器node服务端口 -d 镜像名）
+
+docker run -it --rm --name my-running-app my-nodejs-app 
+
+
+
+ Docker Compose
+
+组合多个容器一起运行
+
+docker-compose build  
+docker-compose up
+
+
+
+### mysql
+
+
+
+mkdir -p ~/mysql/data ~/mysql/logs ~/mysql/conf
+
+docker run -p 3306:3306 --name mymysql -v $PWD/conf:/etc/mysql/conf.d -v $PWD/logs:/logs -v $PWD/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 -d mysql:laster
+
+
+
+-p 3306:3306：将容器的 3306 端口映射到主机的 3306 端口。
+
+-v -v $PWD/conf:/etc/mysql/conf.d：将主机当前目录下的 conf/my.cnf 挂载到容器的 /etc/mysql/my.cnf。
+-v $PWD/logs:/logs：将主机当前目录下的 logs 目录挂载到容器的 /logs。
+-v $PWD/data:/var/lib/mysql ：将主机当前目录下的data目录挂载到容器的 /var/lib/mysql 。
+-e MYSQL_ROOT_PASSWORD=123456：初始化 root 用户的密码。
