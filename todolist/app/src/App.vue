@@ -8,9 +8,9 @@
     <div>
       <ul style="width: 400px;border: 1px solid #ccc;" v-show="list.length">
         <li v-for="(item, index) in list" :key="index" style="display: flex;justify-content: space-between;">
-          <span><input :disabled="item.check" v-model="item.check" type="checkbox"></span>
-          <span style="flex:1;" :style="`${item.check ? 'text-decoration: line-through;' : ''}`">{{item.text}}</span>
-          <span style="cursor: pointer;" @click="handleClose(index)">X</span>
+          <span><input @change="handleCheck(item.id)" :disabled="!!item.checked" v-model="item.checked" type="checkbox"></span>
+          <span style="flex:1;" :style="`${item.checked ? 'text-decoration: line-through;' : ''}`">{{item.text}}</span>
+          <span style="cursor: pointer;" @click="handleClose(item.id)">X</span>
         </li>
       </ul>
     </div>
@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import {apiGetList} from './services/index.js';
+import {apiGetList, apiCheck, apiInsert, apiDelete} from './services/index.js';
 
 export default {
   name: 'app',
@@ -30,18 +30,33 @@ export default {
   },
   methods: {
     handleAdd() {
-      this.list.push({text:this.value, check: false});
-      this.value = '';
+      apiInsert({text:this.value, checked: 0}).then((res) => {
+        console.log(res, 'resres');
+        this.handleGetList();
+        this.value = '';
+      })
     },
-    handleClose(index) {
-      this.list.splice(index, 1);
+    handleClose(id) {
+      apiDelete({id}).then((res) => {
+        console.log(res, 'apiDelete');
+        this.handleGetList();
+      })
+    },
+    handleCheck(id) {
+      console.log(id, 'id');
+      apiCheck({id}).then((res) => {
+        console.log(res, 'apiCheck');
+      })
+    },
+    handleGetList() {
+      apiGetList().then((res) => {
+        console.log(res, 'res');
+        this.list = this.$set(this, 'list', res || []);
+      })
     }
   },
   created () {
-    apiGetList().then((res) => {
-      console.log(res, 'res');
-      this.list = this.$set(this, 'list', res || []);
-    })
+    this.handleGetList();
   }
 }
 </script>
