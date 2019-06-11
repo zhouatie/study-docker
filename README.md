@@ -1,8 +1,15 @@
 https://juejin.im/post/5a498ad9f265da43052ef8d6
+
 https://juejin.im/post/5c2c69cee51d450d9707236e
 https://juejin.im/entry/577a70eac4c97100557b9c5e
 node: 
 https://nodejs.org/zh-cn/docs/guides/nodejs-docker-webapp/
+
+docker node mongodb
+https://www.cnblogs.com/zhangyanbo/p/5851644.html
+
+docker 命令
+https://www.runoob.com/docker/docker-command-manual.html
 
 
 docker container ls
@@ -24,6 +31,7 @@ IMAGE ID REPOSITORY TAG
 如果要删除本地的镜像，可以使用 docker image rm 命令，其格式为：
 $ docker image rm [选项] <镜像1> [<镜像2> ...]
 docker image rm 501
+
 
 
 
@@ -242,3 +250,179 @@ docker run -p 3306:3306 --name mymysql -v $PWD/conf:/etc/mysql/conf.d -v $PWD/lo
 -v $PWD/logs:/logs：将主机当前目录下的 logs 目录挂载到容器的 /logs。
 -v $PWD/data:/var/lib/mysql ：将主机当前目录下的data目录挂载到容器的 /var/lib/mysql 。
 -e MYSQL_ROOT_PASSWORD=123456：初始化 root 用户的密码。
+
+
+
+docker也是有ip的
+
+启动mysql：
+docker run --name=mysql -itd -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql 
+查看容器ip
+
+docker inspect <容器id> | grep IPAddre
+
+
+
+navcat连接mysql：
+
+https://blog.csdn.net/weixin_42242494/article/details/80630267
+
+设置可访问
+
+docker exec -it mysql(容器名字) bash
+
+
+
+mysql -uroot -p(接上密码)
+
+mysql -uroot -p123456 
+
+查看用户信息
+
+ select host,user,plugin,authentication_string from mysql.user;    
+
+修改plugin为mysql_native_password 才能访问
+
+ALTER user 'root'@'%' IDENTIFIED WITH mysql_native_password BY '123456';  
+
+
+
+mysql 控制台命令
+
+https://blog.csdn.net/tww85/article/details/52778683
+
+
+docker cp 拷贝 
+
+从主机拷贝到docker ：docker cp <host path>  <contain_name>:<docker path>
+
+从docker拷贝到主机： docker cp <contain_name>:<docker path> <host path>
+
+
+
+docker node
+
+
+
+https://juejin.im/post/5b2cb6986fb9a00e3a5aa279
+
+
+
+dockerfile
+
+# 基于最新的 node 镜像
+FROM node:latest
+# 复制当前目录下所有文件到目标镜像 /app/ 目录下
+COPY . /app/
+# 修改工作目录
+WORKDIR /app/
+# yarn 一下，安装依赖
+RUN ["yarn"]
+# 启动 node server
+ENTRYPOINT ["node", "index.js"]
+
+
+
+### build
+
+docker build -t zhouatie/todolist-server:v1 .
+
+
+
+docker run -it -d -p <主机端口>:<容器内的服务端口> <镜像名>
+
+docker run -it -p 4000:3000 zhouatie/todolist-server:v3
+
+
+
+
+
+国内镜像
+
+https://registry.docker-cn.com/
+
+
+
+中科大镜像文档地址： https://mirrors.ustc.edu.cn/help/dockerhub.html
+
+
+
+编写 Dockerfile
+
+https://www.cnblogs.com/bigberg/p/9001584.html
+
+
+
+
+
+docker build -t zhouatie/todolist-static:v5 .
+
+docker run -itd -p 4000:3000 zhouatie/todolist-server:v7
+
+-t 表示添加标签
+
+. 表示当前目录即 Dockerfile所在的目录
+
+
+
+删除镜像
+
+docker rmi <镜像id>
+
+
+
+查看端口映射配置
+
+docker port nostalgic_morse 5000
+
+查看该容器5000端口映射的主机ip端口
+
+
+
+
+
+docker-compose node mysql
+
+https://blog.csdn.net/qq_25243451/article/details/88316654
+
+
+
+docker network 实现互通(好简单，创建一个网络填写下类型 然后其他应用的network配置下这个网络就可以了）
+
+通过别名实现互通 --link？？？
+
+link
+
+    - mysql
+
+访问的时候直接 mysql:3000???
+
+
+
+
+
+volumn数据卷？？？
+
+
+
+别人的配置引发的思考
+
+https://segmentfault.com/q/1010000018279435
+
+
+
+
+
+今日必须做：
+
+运用docker-compose
+
+优化Dockerfile
+
+比如环境变量等
+
+整理docker命令
+
+整理docker文档
+
+晚上试下配置相同network 然后代码里用127.0.0.1 来访问服务试下
