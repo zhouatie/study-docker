@@ -4,7 +4,7 @@ FROM node:latest
 COPY . /todolist/app
 # 修改工作目录
 WORKDIR /todolist/app
-# yarn 一下，安装依赖
-RUN ["npm", "install"]
+RUN npm config set registry https://registry.npm.taobao.org && npm install
+# RUN ["npm", "install"]
 # 启动 node server
 ENTRYPOINT ["npm", "run", "serve"]
