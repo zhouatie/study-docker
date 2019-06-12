@@ -411,6 +411,63 @@ https://segmentfault.com/q/1010000018279435
 
 
 
+docker 系列教程
+
+http://www.itmuch.com/docker/01-docker-summary/
+
+
+
+docker中查看ip
+
+用ip addr show
+
+
+
+docker network create --driver bridge network_name
+
+创建网桥
+
+
+
+其他容器都可以
+
+docker run --network=<NETWORK>
+
+
+
+
+
+查看网桥连接的容器
+
+docker network ls
+
+
+
+如果
+
+services
+
+    :nodejs
+
+静态通过 http://nodejs:3000 能调通
+
+services
+
+    :nodejs1
+静态通过 http://nodejs:3000 不能调通
+
+  nodejs1:
+    build: ./server/
+    container_name: nodejs
+
+静态通过 http://nodejs:3000 能调通
+
+
+
+上面实例说明 容器会把services名字或者容器名字当做容器网络标识
+
+
+
 
 
 今日必须做：
