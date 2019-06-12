@@ -4,10 +4,17 @@ const app = express();
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
+// app.get('/getList', async (req, res) => {
+//     res.json({
+//         code: 0,
+//         data: [],
+//         message: 'success'
+//     })
+// })
 const connection = mysql.createConnection({
     host: 'db',
     user: 'root',
-    port: '3308',
+    port: '3306',
     password: '123456',
     database: 'todolist'
 });

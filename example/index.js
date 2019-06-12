@@ -8,9 +8,8 @@ const router = new Router();
 const connection = mysql.createConnection({
     host: '127.0.0.1',
     user: 'root',
-    port: '3307',
-    password: '123456',
-    database: 'mysqlkoa'
+    port: '3308',
+    password: '123456'
 });
 
 connection.connect(err => {
