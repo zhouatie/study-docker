@@ -1,5 +1,5 @@
 # 基于最新的 node 镜像
-FROM node:latest
+FROM node:8
 # 复制当前目录下所有文件到目标镜像 /app/ 目录下
 COPY . /todolist/app
 # 修改工作目录

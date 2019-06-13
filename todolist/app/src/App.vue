@@ -30,27 +30,19 @@ export default {
   },
   methods: {
     handleAdd() {
-      apiInsert({text:this.value, checked: 0}).then((res) => {
-        console.log(res, 'resres');
+      apiInsert({text:this.value, checked: 0}).then(() => {
         this.handleGetList();
         this.value = '';
       })
     },
     handleClose(id) {
-      apiDelete({id}).then((res) => {
-        console.log(res, 'apiDelete');
-        this.handleGetList();
-      })
+      apiDelete({id}).then(this.handleGetList)
     },
     handleCheck(id) {
-      console.log(id, 'id');
-      apiCheck({id}).then((res) => {
-        console.log(res, 'apiCheck');
-      })
+      apiCheck({id})
     },
     handleGetList() {
       apiGetList().then((res) => {
-        console.log(res, 'res');
         this.list = this.$set(this, 'list', res || []);
       })
     }

@@ -19,5 +19,5 @@ DROP TABLE IF EXISTS `list`;
 CREATE TABLE `list` (
     `id` INT(11) AUTO_INCREMENT PRIMARY KEY,
     `text` VARCHAR(255),
-    `check` INT(11) DEFAULT 0
+    `checked` INT(11) DEFAULT 0
 )
