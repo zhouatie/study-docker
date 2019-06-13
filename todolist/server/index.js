@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 // })
 const connection = mysql.createConnection({
     host: 'db',
-    user: 'root',
+    user: 'docker',
     port: '3306',
     password: '123456',
     database: 'todolist'
