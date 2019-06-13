@@ -10,7 +10,9 @@ const opt = {
     port: '3306',
     password: '123456'
 };
+console.log('connect1')
 let connection = mysql.createConnection(opt);
+console.log('connect2')
 
 const sqlFn = (sql) => {
     return new Promise((resolve, reject) => {
@@ -24,6 +26,7 @@ const sqlFn = (sql) => {
 connection.connect(async (err) => {
     if (err) throw err;
     console.log('mysql connncted success!');
+    console.log('connect3')
 
     const findDatabase = `show databases like 'todolist'`
     const database = await sqlFn(findDatabase);
@@ -31,11 +34,14 @@ connection.connect(async (err) => {
     if (!database.length) {
         const result = await sqlFn('create database todolist');
     }
+    console.log('connect4')
 
-    connection = mysql.createConnection({...opt, ...{database: 'todolist'}});
+    connection = await mysql.createConnection({...opt, ...{database: 'todolist'}});
+    console.log('connect5')
 
     const findTables = `show tables like 'list'`;
     const tables = await sqlFn(findTables);
+    console.log('connect6')
 
     if (!tables.length) {
         const sql = `CREATE TABLE list (
@@ -45,6 +51,7 @@ connection.connect(async (err) => {
             )`;
         const result = await sqlFn(sql);
     }
+    console.log('connect7')
 })
 
 app.get('/sql', async (req, res) => {
