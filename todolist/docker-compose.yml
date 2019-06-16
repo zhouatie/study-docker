@@ -15,6 +15,7 @@ services:
     container_name: nodejs
     ports:
       - 4000:3000
+    command: 'sh ./wait-for-it.sh db:3306 -- echo "hello world ========="'
     depends_on:
       - db
 
