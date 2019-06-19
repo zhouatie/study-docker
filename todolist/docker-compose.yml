@@ -11,10 +11,15 @@ services:
       - db
 
   nodejs:
-    build: ./server/
+    build:
+      context: ./server/
+      dockerfile: sleep-dockerfile
     container_name: nodejs
     ports:
       - 4000:3000
+    environment:
+      - IS_START_BY_COMPOSE=1
+    # command: sh ./wait-for-it.sh
     command: sh ./sleep.sh
     depends_on:
       - db
