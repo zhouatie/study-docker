@@ -7,4 +7,4 @@ WORKDIR /todolist/server
 # yarn 一下，安装依赖
 RUN ["npm", "install"]
 # 启动 node server
-ENTRYPOINT ["node", "index.js"]
+# ENTRYPOINT ["node", "index.js"]
