@@ -125,7 +125,12 @@ root@2a87b2f62a6e:/#
 
 举个`node`镜像的例子
 
+新建一个文件夹
+
+我这里就新建一个名为node的文件夹，具体文件可参照我的github项目的[node目录](www.baidu.com)
+
 ```javascript
+// index.js
 const express = require('express');
 const app = express();
 
@@ -135,6 +140,35 @@ app.get('/', (req, res) => {
 
 app.listen(6001)
 ```
+
+```javascript
+// Dockerfile
+FROM node:8
+
+WORKDIR /home/node
+
+COPY . ./
+
+RUN npm install
+
+CMD npm start
+```
+
+指令介绍
+- FROM 我这个node例子是基于node8镜像
+
+- WORKDIR 指定工作区。
+
+- COPY 将本地目录文件拷贝到docker中
+
+- RUN 运行一个容器，每个RUN都会生成一个容器
+
+- CMD 执行命令，与RUN相似
+
+
+
+
+详细解释，详见[docker入门到实践](https://yeasy.gitbooks.io/docker_practice/content/image/dockerfile/)
 
 
 
