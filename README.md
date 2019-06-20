@@ -114,6 +114,8 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
 ```
 可以看到STATUS一栏处，该容器是处于停止状态的。
 
+使用`docker container prune`，来清空停用状态的容器。
+
 使用`docker exec`命令进入运行中的容器
 
 如想进入刚才后台运行的容器的交互式界面:`docker exec -it <容器名称 或者 容器id> bash`
@@ -122,6 +124,11 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
 ➜  study-docker git:(master) ✗ docker exec -it first bash
 root@2a87b2f62a6e:/#
 ```
+
+**想查看更多关于docker的命令，[点击这里](https://www.runoob.com/docker/docker-command-manual.html)**
+
+
+### Dockerfile
 
 举个`node`镜像的例子
 
@@ -147,7 +154,7 @@ FROM node:8
 
 WORKDIR /home/node
 
-COPY . ./
+COPY ../ ../
 
 RUN npm install
 
@@ -165,33 +172,60 @@ CMD npm start
 
 - CMD 执行命令，与RUN相似
 
+> 注意 有必要添加.dockerignore文件，文件中可以填写你不想打包进容器的文件。类似于.gitignore
+
+```javascript
+// .dockerignore
+/node_modules
+package-lock.json
+```
+
+详细解释，详见[dockerfile](https://yeasy.gitbooks.io/docker_practice/content/image/dockerfile/)
 
 
+`docker build` 命令用于使用 Dockerfile 创建镜像
 
-详细解释，详见[docker入门到实践](https://yeasy.gitbooks.io/docker_practice/content/image/dockerfile/)
+执行：`docker build -t mynode .`;
 
+- -t: 镜像的名字及标签，通常 name:tag 或者 name 格式；可以在一次构建中为一个镜像设置多个标签。tag不写默认为latest版本
 
+要注意后面的.  这个表示Dockerfile文件在当前目录。
 
+构建镜像成功之后：
 
+```javascript
+➜  node git:(master) ✗ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+mynode              latest              3cd10521f802        10 hours ago        898MB
+```
 
+接下来就基于该镜像运行一个node容器:
+`docker run --name mynode -p 4001:6001 mynode`
 
+- --name: 表示该容器的匿名
+- -p: 表示端口映射，因为主机的ip跟容器的ip是不同的，需要把容器的服务映射到0.0.0.0:自己设置的主机端口，host不填默认为0.0.0.0。 <主机端口>:<容器中端口>；
 
+```javascript
+➜  node git:(master) ✗ docker run --name mynode -p 4001:6001 mynode
 
+> example2@1.0.0 start /home/node
+> node index.js
+```
 
+浏览器访问`localhost:4001`,页面会展示出node响应的`success`字符串了。
 
+构建完镜像后，你觉得不需要该镜像，想删除怎么办呢？
 
-删除镜像
+首先执行：`docker images`列出镜像列表
 
-上传镜像
+```javascript
+➜  node git:(master) ✗ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+mynode              latest              3cd10521f802        10 hours ago        898MB
+```
 
+使用`docker rmi <image id>`来删除镜像：`docker rmi 3cd10521f802`,如果提醒该镜像被容器占用着，那么你就需要先删除该容器(参考上面介绍的命令)。
 
-**想查看更多关于docker的命令，[点击这里](https://www.runoob.com/docker/docker-command-manual.html)**
-
-
-### docker命令介绍
-
-
-### Dockerfile
 
 ### 多容器连接
 
