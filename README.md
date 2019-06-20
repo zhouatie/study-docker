@@ -114,6 +114,19 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
 ```
 可以看到STATUS一栏处，该容器是处于停止状态的。
 
+使用`docker rm <容器id 或者 容器昵称>`
+```javascript
+➜  node git:(master) docker container ls -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                      PORTS               NAMES
+a217eea7188f        ubuntu              "/bin/bash"         11 seconds ago      Exited (0) 10 seconds ago                       dreamy_ishizaka
+```
+执行`docker rm a21` (id可以不输全)
+```javascript
+➜  node git:(master) docker rm a21
+a21
+```
+执行完之后，命令行会返回之前输入的容器id
+
 使用`docker container prune`，来清空停用状态的容器。
 
 使用`docker exec`命令进入运行中的容器
@@ -225,9 +238,6 @@ mynode              latest              3cd10521f802        10 hours ago        
 ```
 
 使用`docker rmi <image id>`来删除镜像：`docker rmi 3cd10521f802`,如果提醒该镜像被容器占用着，那么你就需要先删除该容器(参考上面介绍的命令)。
-
-
-### 多容器连接
 
 
 
