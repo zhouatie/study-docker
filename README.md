@@ -147,7 +147,7 @@ root@2a87b2f62a6e:/#
 
 新建一个文件夹
 
-我这里就新建一个名为node的文件夹，具体文件可参照我的github项目的[node目录](www.baidu.com)
+我这里就新建一个名为node的文件夹，具体文件可参照我的github项目的[node目录](https://github.com/zhouatie/study-docker/tree/master/node)
 
 ```javascript
 // index.js
