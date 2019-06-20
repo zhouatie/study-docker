@@ -248,3 +248,12 @@ mynode              latest              3cd10521f802        10 hours ago        
 
 ## docker实战
 
+本次实战案例是todolist。技术栈为vue、node、mysql。具体代码见项目目录[todolist](https://github.com/zhouatie/study-docker/tree/master/todolist),下面就不一一贴代码了。就讲下重点。
+
+### 构建vue
+
+todolist的静态页面，我是通过vue-cli3搭建的。
+执行`vue create app` 创建项目。
+
+然后编写简易的具有增删改查的todolist应用。具体代码见[todolist](https://github.com/zhouatie/study-docker/tree/master/todolist)。
+
