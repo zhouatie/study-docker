@@ -2,7 +2,7 @@
 
 ## 前言
 
-文本将分为两篇（基础篇与实战篇）介绍docker从入门到实战。如果你觉得有收获欢迎给我的github点赞。
+文本将分为两篇（基础篇与实战篇）介绍docker从入门到实战。基础篇包括简介、安装、起步、基础的命令、及一个node例子。实战篇会分享一个项目。技术栈为vue、node、mysql、docker-compose。如果你觉得有收获欢迎给我的github点赞。
 
 ## docker基础
 
@@ -247,3 +247,4 @@ mynode              latest              3cd10521f802        10 hours ago        
 
 
 ## docker实战
+
