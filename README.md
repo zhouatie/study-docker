@@ -250,10 +250,66 @@ mynode              latest              3cd10521f802        10 hours ago        
 
 本次实战案例是todolist。技术栈为vue、node、mysql。具体代码见项目目录[todolist](https://github.com/zhouatie/study-docker/tree/master/todolist),下面就不一一贴代码了。就讲下重点。
 
+下面我就顺着依赖关系来讲，所以先从mysql开始讲起
+
+### 构建mysql
+
+执行：`docker run --name mymysql -d -p 3308:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql`
+
+- --name 给mysql容器设置匿名
+- -d表示后台运行
+- -p表示将容器的3306端口的映射到本地的3308端口，如果不设置的话，本地是无法访问该MySQL服务的。
+- -e MYSQL_ROOT_PASSWORD 设置root的账号密码。
+- mysql 后面不指定版本话，默认会latest版本
+
+在执行该语句之前，假如你之前没有pull过mysql镜像。docker在本地找不到你要的镜像就会帮你从docker仓库拉取mysql:latest镜像。
+
+这个时候容器就启动成功了。
+
+尝试下用navicat连接下试试
+
+鼠标放入黄色小三角出现如下报错。
+
+```javascript
+2013 - Lost connection to MySQL server at 'reading initial communication packet', system error: 0 "Internal error/check (Not system error)"
+```
+
+这是因为mysql8以上，都会使用新的验证方式。
+
+不妨查下信息: `select host,user,plugin,authentication_string from mysql.user; `
+```javascript
+mysql> select host,user,plugin,authentication_string from mysql.user;
++-----------+------------------+-----------------------+------------------------------------------------------------------------+
+| host      | user             | plugin                | authentication_string                                                  |
++-----------+------------------+-----------------------+------------------------------------------------------------------------+
+| %         | root             | caching_sha2_password | *6BB4837EB74329105EE4568DDA7DC67ED2CA2AD9                              |
+| localhost | mysql.infoschema | caching_sha2_password | $A$005$THISISACOMBINATIONOFINVALIDSALTANDPASSWORDTHATMUSTNEVERBRBEUSED |
+| localhost | mysql.session    | caching_sha2_password | $A$005$THISISACOMBINATIONOFINVALIDSALTANDPASSWORDTHATMUSTNEVERBRBEUSED |
+| localhost | mysql.sys        | caching_sha2_password | $A$005$THISISACOMBINATIONOFINVALIDSALTANDPASSWORDTHATMUSTNEVERBRBEUSED |
+)7k44VulAglQJgGpvgSG.ylA/rdbkqWjiqQJiq3DGsug5HIy3 |ord | $A$005$0pU+sGm[on
++-----------+------------------+-----------------------+------------------------------------------------------------------------+
+```
+
+plugin一栏可看到都是caching_sha2_password。
+
+那么如何才能将其改成可连接的呢？只需要将其plugin改成mysql_native_password就可以访问了。
+
+`ALTER user 'root'@'%' IDENTIFIED WITH mysql_native_password BY '123456';`
+
+你可以先用上面查询账户信息查下是否修改成功了。
+
+修改成功后，可以尝试下用navicat连接下mysql。不出意外的会就能成功连接上了。
+
+当然我下面的例子用mysql:5.6，方便操作，不需要修改plugin。
+
+
+
 ### 构建vue
 
 todolist的静态页面，我是通过vue-cli3搭建的。
 执行`vue create app` 创建项目。
+
+进入项目根目录执行`npm run serve`页面是否正常执行。
 
 然后编写简易的具有增删改查的todolist应用。具体代码见[todolist](https://github.com/zhouatie/study-docker/tree/master/todolist)。
 
