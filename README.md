@@ -302,6 +302,175 @@ plugin一栏可看到都是caching_sha2_password。
 
 当然我下面的例子用mysql:5.6，方便操作，不需要修改plugin。
 
+执行命令：`docker run --name mymysql -d -e MYSQL_ROOT_PASSWORD=123456 -p 3308:3306  mysql:5.6`
+
+启动容器后可以执行：`docker exec -it mymysql bash`进入容器
+
+执行：`mysql -uroot -p123456`进入mysql控制台
+
+执行：`show databases;`查看mysql数据库
+```javascript
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
++--------------------+
+3 rows in set (0.00 sec)
+```
+
+执行：`create database todolist;`创建todolist应用的数据库
+
+执行：`show databases;`查看刚刚创建的todolist数据库
+```javascript
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| todolist           |
++--------------------+
+4 rows in set (0.00 sec)
+```
+可以看到数据库中多了个todolist数据库
+
+接下来选择该todolist数据库
+
+执行：`use todolist;`选中该数据库
+
+创建表:
+```javascript
+CREATE TABLE list (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    text VARCHAR(255),
+    checked INT(11) DEFAULT 0
+    )
+```
+
+执行：`show tables;`查看todolist数据库下的表
+```javascript
+mysql> show tables;
++--------------------+
+| Tables_in_todolist |
++--------------------+
+| list               |
++--------------------+
+1 row in set (0.00 sec)
+```
+
+执行：`describe list;`查看表
+```
+mysql> describe list;
++---------+--------------+------+-----+---------+----------------+
+| Field   | Type         | Null | Key | Default | Extra          |
++---------+--------------+------+-----+---------+----------------+
+| id      | int(11)      | NO   | PRI | NULL    | auto_increment |
+| text    | varchar(255) | YES  |     | NULL    |                |
+| checked | int(11)      | YES  |     | 0       |                |
++---------+--------------+------+-----+---------+----------------+
+3 rows in set (0.01 sec)
+```
+
+执行：`insert into list set checked = 0, text = 'haha'` 往表中插入一条数据；
+
+执行：`select * from list;`
+```javascript
+mysql> select * from list;
++----+------+---------+
+| id | text | checked |
++----+------+---------+
+|  1 | haha |       0 |
++----+------+---------+
+1 row in set (0.01 sec)
+```
+
+一切正常
+
+### 构建node
+
+mysql服务启动好了，接下来就是启动node服务，并连接刚启动的mysql服务了。
+
+话不多说，直接上代码，解释看注释
+
+```javascript
+// index.js
+const mysql = require('mysql'); // mysql包
+const express = require('express');
+const app = express();
+const bodyParser = require('body-parser'); // post请求需要引入的包
+app.use(bodyParser.json());
+
+// mysql配置（用于连接刚启动的mysql服务）
+const opt = {
+    host: 'localhost',
+    user: 'root',
+    port: '3308',
+    password: '123456',
+    database: 'todolist'
+};
+
+const connection = mysql.createConnection(opt);
+
+const sqlFn = (sql) => {
+    return new Promise((resolve, reject) => {
+        connection.query(sql, (err, results, filelds) => {
+            if (err) throw err;
+            resolve(results);
+        });
+    })
+}
+
+connection.connect(async (err) => {
+    if (err) throw err;
+    console.log('mysql connncted success!');
+})
+
+// todolist 列表查询
+app.get('/getList', async (req, res) => {
+    const sql = `SELECT * FROM list`;
+
+    const data = await sqlFn(sql);
+
+    res.json({
+        code: 0,
+        data,
+        message: 'success'
+    })
+})
+
+// todolist 插入数据
+app.post('/insert', async (req, res) => {
+    const sql = `INSERT INTO list SET checked = ${req.body.checked}, text = '${req.body.text}'`;
+    const data = await sqlFn(sql);
+
+    res.json({
+        code: 0,
+        data,
+        message: 'success'
+    })
+})
+
+app.listen(3000);
+
+```
+
+执行: `node index.js`后，控制台输入
+
+```javascript
+➜  server git:(master) ✗ node index.js  
+mysql connncted success!
+```
+表示node服务连接mysql服务成功；
+
+浏览器可以访问下`localhost:3000/getList`
+```javascript
+{"code":0,"data":[{"id":1,"text":"haha","checked":0}],"message":"success"}
+```
+页面将会出现刚才我们sql插入到数据库的数据
 
 
 ### 构建vue
