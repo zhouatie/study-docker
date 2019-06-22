@@ -464,13 +464,58 @@ app.listen(3000);
 ➜  server git:(master) ✗ node index.js  
 mysql connncted success!
 ```
+
 表示node服务连接mysql服务成功；
 
 浏览器可以访问下`localhost:3000/getList`
+
 ```javascript
 {"code":0,"data":[{"id":1,"text":"haha","checked":0}],"message":"success"}
 ```
+
 页面将会出现刚才我们sql插入到数据库的数据
+
+既然代码没有问题，那么我们接下来就把他构建成镜像。
+
+在当前文件夹新建名为Dockerfile的文件
+
+```sh
+# 基于最新的 node 镜像
+FROM node:8
+# 复制当前目录下所有文件到目标镜像 /app/ 目录下
+COPY . /todolist/server
+# 修改工作目录
+WORKDIR /todolist/server
+# 安装依赖
+RUN ["npm", "install"]
+# 启动 node server
+ENTRYPOINT ["node", "index.js"]
+
+```
+
+执行：`docker build -t mynode .`，生成node镜像
+
+- -t:表示给该镜像添加版本，这里不写默认为latest
+
+可通过`docker images`查看本地的镜像。
+
+```javascript
+➜  server git:(master) ✗ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+mynode              latest              3e8de2825063        4 seconds ago       898MB
+```
+
+可以看到第一个镜像就是我们刚刚构建的镜像
+
+```javascript
+➜  server git:(master) ✗ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+mynode              latest              3e8de2825063        4 seconds ago       898MB
+```
+
+接下来运行基于这个镜像的容器
+
+执行：``
 
 
 ### 构建vue
