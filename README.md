@@ -244,8 +244,6 @@ mynode              latest              3cd10521f802        10 hours ago        
 使用`docker rmi <image id>`来删除镜像：`docker rmi 3cd10521f802`,如果提醒该镜像被容器占用着，那么你就需要先删除该容器(参考上面介绍的命令)。
 
 
-
-
 ## docker实战
 
 本次实战案例是todolist。技术栈为vue、node、mysql。具体代码见项目目录[todolist](https://github.com/zhouatie/study-docker/tree/master/todolist),下面就不一一贴代码了。就讲下重点。
@@ -277,6 +275,7 @@ mynode              latest              3cd10521f802        10 hours ago        
 这是因为mysql8以上，都会使用新的验证方式。
 
 不妨查下信息: `select host,user,plugin,authentication_string from mysql.user; `
+
 ```javascript
 mysql> select host,user,plugin,authentication_string from mysql.user;
 +-----------+------------------+-----------------------+------------------------------------------------------------------------+
@@ -298,7 +297,7 @@ plugin一栏可看到都是caching_sha2_password。
 
 你可以先用上面查询账户信息查下是否修改成功了。
 
-修改成功后，可以尝试下用navicat连接下mysql。不出意外的会就能成功连接上了。
+修改成功后，可以尝试下用navicat连接下mysql。不出意外的话就能成功连接上了。
 
 当然我下面的例子用mysql:5.6，方便操作，不需要修改plugin。
 
@@ -309,6 +308,7 @@ plugin一栏可看到都是caching_sha2_password。
 执行：`mysql -uroot -p123456`进入mysql控制台
 
 执行：`show databases;`查看mysql数据库
+
 ```javascript
 mysql> show databases;
 +--------------------+
@@ -324,6 +324,7 @@ mysql> show databases;
 执行：`create database todolist;`创建todolist应用的数据库
 
 执行：`show databases;`查看刚刚创建的todolist数据库
+
 ```javascript
 mysql> show databases;
 +--------------------+
@@ -336,6 +337,7 @@ mysql> show databases;
 +--------------------+
 4 rows in set (0.00 sec)
 ```
+
 可以看到数据库中多了个todolist数据库
 
 接下来选择该todolist数据库
@@ -343,6 +345,7 @@ mysql> show databases;
 执行：`use todolist;`选中该数据库
 
 创建表:
+
 ```javascript
 CREATE TABLE list (
     id INT(11) AUTO_INCREMENT PRIMARY KEY,
@@ -352,6 +355,7 @@ CREATE TABLE list (
 ```
 
 执行：`show tables;`查看todolist数据库下的表
+
 ```javascript
 mysql> show tables;
 +--------------------+
@@ -363,7 +367,8 @@ mysql> show tables;
 ```
 
 执行：`describe list;`查看表
-```
+
+```javascript
 mysql> describe list;
 +---------+--------------+------+-----+---------+----------------+
 | Field   | Type         | Null | Key | Default | Extra          |
@@ -378,6 +383,7 @@ mysql> describe list;
 执行：`insert into list set checked = 0, text = 'haha'` 往表中插入一条数据；
 
 执行：`select * from list;`
+
 ```javascript
 mysql> select * from list;
 +----+------+---------+
@@ -515,8 +521,23 @@ mynode              latest              3e8de2825063        4 seconds ago       
 
 接下来运行基于这个镜像的容器
 
-执行：``
+执行：`docker run --name mynode -d -p 4000:3000 mynode`
 
+- --name 给node容器起一个容器匿名
+- -d 表示后台运行
+- -p 4000:3000 表示访问本地4000代理容器内的3000端口服务
+- mynode 是上面我们build构建的镜像
+
+
+启动成功后，访问下`localhost:4000/getList`
+
+```javascript
+{"code":0,"data":[{"id":1,"text":"haha","checked":0}],"message":"success"}
+```
+
+可以看到页面输出我们上面执行sql语句插入的数据
+
+上面贴的代码只是基础的查看列表与插入数据两个方法，其他的请参考[server](https://github.com/zhouatie/study-docker/tree/master/todolist/server/index.js)
 
 ### 构建vue
 
@@ -526,4 +547,29 @@ todolist的静态页面，我是通过vue-cli3搭建的。
 进入项目根目录执行`npm run serve`页面是否正常执行。
 
 然后编写简易的具有增删改查的todolist应用。具体代码见[todolist](https://github.com/zhouatie/study-docker/tree/master/todolist)。
+
+**注意vue.config.js中的devServer配置的target: 'http://127.0.0.1:4000'代理到我们刚启动的node容器**
+
+页面启动成功后，访问`localhost:8080`
+
+可以看到页面加载成功，列表也成功渲染出上面构建mysql时，sql插入的数据。
+
+本地启动静态并请求服务端成功后，接下来也将静态页面打包成镜像，然后启动静态页面容器
+
+编写Dockerfile
+
+```shell
+# 基于最新的 node 镜像
+FROM node:8
+# 复制当前目录下所有文件到目标镜像 /app/ 目录下
+COPY . /todolist/app
+# 修改工作目录
+WORKDIR /todolist/app
+RUN npm config set registry https://registry.npm.taobao.org && npm install
+# RUN ["npm", "install"]
+# 启动 node server
+ENTRYPOINT ["npm", "run", "serve"]
+```
+
+cd到静态页面的根目录执行: `docker build -t static .`
 

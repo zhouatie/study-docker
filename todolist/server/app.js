@@ -6,7 +6,7 @@ app.use(bodyParser.json());
 
 // mysql配置（用于连接刚启动的mysql服务）
 const opt = {
-    host: '192.168.1.109',
+    host: '192.168.1.105', // 此处填上你的ip地址
     user: 'root',
     port: '3308',
     password: '123456',
@@ -32,9 +32,9 @@ connection.connect(async (err) => {
 // todolist 列表查询
 app.get('/getList', async (req, res) => {
     const sql = `SELECT * FROM list`;
-
+    console.log(1111);
     const data = await sqlFn(sql);
-
+    console.log(data, '2222');
     res.json({
         code: 0,
         data,
@@ -54,4 +54,4 @@ app.post('/insert', async (req, res) => {
     })
 })
 
-app.listen(3000);
+app.listen(4000);
