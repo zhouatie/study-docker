@@ -483,6 +483,8 @@ mysql connncted success!
 
 既然代码没有问题，那么我们接下来就把他构建成镜像。
 
+**构建之前需要把代码中opt的host localhost改为自己主机的ip。因为容器启动的话，连接mysql需要通过主机的3308端口访问。**
+
 在当前文件夹新建名为Dockerfile的文件
 
 ```sh
@@ -581,4 +583,50 @@ cd到静态页面的根目录执行: `docker build -t static .`
 打开浏览器访问`localhost:9000`,可以看到页面成功渲染出列表页。
 
 至此，mysql、node、vue容器均已互通。代码需要完善的地方详见[todolist](https://github.com/zhouatie/study-docker/tree/master/todolist)
+
+### docker-compose
+
+我们不可能每次部署一个应用，需要手动启动好几个服务。这个时候就需要使用[docker-compose](https://yeasy.gitbooks.io/docker_practice/content/compose/introduction.html)
+
+在根目录下新建`docker-compose.yml`配置文件
+
+```shell
+version: '2'
+services:
+
+  static:
+    build: ./app/
+    container_name: static
+    ports:
+     - 7001:8080
+    depends_on:
+      - nodejs
+      - db
+
+  nodejs:
+    build:
+      context: ./server/
+      dockerfile: sleep-dockerfile
+    container_name: nodejs
+    ports:
+      - 4000:3000
+    environment:
+      - IS_START_BY_COMPOSE=1
+    command: sh ./sleep.sh
+    depends_on:
+      - db
+
+  db:
+    image: mysql:5.6
+    container_name: db
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+    command:
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+    ports:
+      - 3308:3306
+```
+
+具体配置，详见上面贴的链接。下面我介绍下我所写的配置
 
