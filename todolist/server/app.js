@@ -6,7 +6,7 @@ app.use(bodyParser.json());
 
 // mysql配置（用于连接刚启动的mysql服务）
 const opt = {
-    host: '192.168.1.105', // 此处填上你的ip地址
+    host: '172.28.73.174', // 此处填上你的ip地址
     user: 'root',
     port: '3308',
     password: '123456',

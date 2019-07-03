@@ -351,7 +351,7 @@ CREATE TABLE list (
     id INT(11) AUTO_INCREMENT PRIMARY KEY,
     text VARCHAR(255),
     checked INT(11) DEFAULT 0
-    )
+    );
 ```
 
 执行：`show tables;`查看todolist数据库下的表
@@ -380,7 +380,7 @@ mysql> describe list;
 3 rows in set (0.01 sec)
 ```
 
-执行：`insert into list set checked = 0, text = 'haha'` 往表中插入一条数据；
+执行：`insert into list set checked = 0, text = 'haha';` 往表中插入一条数据；
 
 执行：`select * from list;`
 
@@ -556,6 +556,9 @@ todolist的静态页面，我是通过vue-cli3搭建的。
 
 本地启动静态并请求服务端成功后，接下来也将静态页面打包成镜像，然后启动静态页面容器
 
+**在打包镜像容器之前，记得先将vue.config.js中的devServer配置的target: 'http://<主机ip地址>:4000'代理到我们刚启动的node容器**
+
+
 编写Dockerfile
 
 ```shell
@@ -572,4 +575,10 @@ ENTRYPOINT ["npm", "run", "serve"]
 ```
 
 cd到静态页面的根目录执行: `docker build -t static .`
+
+执行：`docker run --name static -d -p 9000:8080 static`启动静态容器
+
+打开浏览器访问`localhost:9000`,可以看到页面成功渲染出列表页。
+
+至此，mysql、node、vue容器均已互通。代码需要完善的地方详见[todolist](https://github.com/zhouatie/study-docker/tree/master/todolist)
 
