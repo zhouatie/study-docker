@@ -2,7 +2,7 @@
 
 ## 前言
 
-文本将分为两篇（基础篇与实战篇）介绍docker从入门到实战。基础篇包括简介、安装、起步、基础的命令、及一个node例子。实战篇会分享一个项目。技术栈为vue、node、mysql、docker-compose。如果你觉得有收获欢迎给我的github点赞。
+本文是我通过三个星期业余时间学习后而写的文章，对docker的了解还处于入门阶段。希望本文能帮忙一些想学习docker的朋友快速入门。练习及实战代码都在github仓库中。如果我的文章能帮助到你的话，可以给我的[docker项目](https://github.com/zhouatie/study-docker)点个赞哦
 
 ## docker基础
 
@@ -152,6 +152,7 @@ root@2a87b2f62a6e:/#
 新建一个文件夹
 
 我这里就新建一个名为node的文件夹，具体文件可参照我的github项目的[node目录](https://github.com/zhouatie/study-docker/tree/master/node)
+
 
 ```javascript
 // index.js
@@ -588,6 +589,9 @@ cd到静态页面的根目录执行: `docker build -t static .`
 
 我们不可能每次部署一个应用，需要手动启动好几个服务。这个时候就需要使用[docker-compose](https://yeasy.gitbooks.io/docker_practice/content/compose/introduction.html)
 
+关于命令就不介绍了，这里贴下链接
+[docker-compose命令](https://yeasy.gitbooks.io/docker_practice/content/compose/commands.html)
+
 在根目录下新建`docker-compose.yml`配置文件
 
 ```shell
@@ -641,3 +645,7 @@ services:
 
 > 值得一提的是，mysql的Dockerfile中做了创建数据库与表的操作。会涉及到关闭数据库密码登录功能。因为关闭之后，操作数据库就不需要输入密码了。等表建完之后在恢复密码。
 > nodejs中的sleep.sh脚本是因为depends_on这个依赖只是单纯的等待其他服务开始启动，并不是等待依赖的服务启动完成之后才开始构建自身的服务。这个时候node初始化会在mysql启动完成之前启动。这样的话，node启动的时候连接mysql就会报错，导致node服务挂掉。所以引用了sleep.sh，让node延迟一段时间启动。
+
+最后在`docker-compose`文件所在的目录下执行`docker-compose build`
+
+再执行：`docker-compose up`就可以启动todolist这个应用的所有服务了。
