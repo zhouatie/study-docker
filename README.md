@@ -624,9 +624,20 @@ services:
     command:
       --default-authentication-plugin=mysql_native_password
       --character-set-server=utf8mb4
-    ports:
-      - 3308:3306
 ```
 
 具体配置，详见上面贴的链接。下面我介绍下我所写的配置
 
+- version: docker-compose的版本
+- services: 代表你用docker-compose启动的几个服务
+- build: 指定 Dockerfile 所在文件夹的路径（可以是绝对路径，或者相对 docker-compose.yml 文件的路径）。 Compose 将会利用它自动构建这个镜像，然后使用这个镜像。
+- container_name: 指定容器名称。
+- ports: 相当于docker run启动容器的-p，<主机ip:容器ip>，这样主机通过这个端口去访问容器中的服务。
+- environment: 只给定名称的变量会自动获取运行 Compose 主机上对应变量的值，可以用来防止泄露不必要的数据。简而言之，就是在容器内可以获取给的环境变量。
+- depends_on: 解决容器的依赖、启动先后的问题。（但是它有个问题就是只是等所依赖的服务开启启动，并不是等依赖的服务启动成功后在构建当前的服务。
+- command: 覆盖容器启动后默认执行的命令
+
+接下来解释下上面用compose启动的服务
+
+> 值得一提的是，mysql的Dockerfile中做了创建数据库与表的操作。会涉及到关闭数据库密码登录功能。因为关闭之后，操作数据库就不需要输入密码了。等表建完之后在恢复密码。
+> nodejs中的sleep.sh脚本是因为depends_on这个依赖只是单纯的等待其他服务开始启动，并不是等待依赖的服务启动完成之后才开始构建自身的服务。这个时候node初始化会在mysql启动完成之前启动。这样的话，node启动的时候连接mysql就会报错，导致node服务挂掉。所以引用了sleep.sh，让node延迟一段时间启动。
